@@ -1,37 +1,46 @@
 #!/usr/bin/env python3
 
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any
 
 
 class DataProcessor(ABC):
+
+    @abstractmethod
     def validate(self, data: Any) -> bool:
-        return (True)
-        
-    def ingest(self, data: Any) -> Any:
-        return (data)
+        pass
+
+    @abstractmethod
+    def ingest(self, data: Any) -> None:
+        pass
+
+    def output(self) -> tuple[int, str]:
+        return ()
 
 
 class NumericProcessor(DataProcessor):
+
     def validate(self, data: Any) -> bool:
-        return (True)
+        return (isinstance(data, int))
         
     def ingest(self, data: Any) -> Any:
         return (data)
 
 
 class TextProcessor(DataProcessor):
+
     def validate(self, data: Any) -> bool:
-        return (True)
+        return (isinstance(data, str))
         
     def ingest(self, data: Any) -> Any:
         return (data)
 
 
 class LogProcessor(DataProcessor):
+    
     def validate(self, data: Any) -> bool:
-        return (True)
+        return (isinstance(data, int))
         
     def ingest(self, data: Any) -> Any:
         return (data)
