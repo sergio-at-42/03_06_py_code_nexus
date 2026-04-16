@@ -37,7 +37,7 @@ class DataProcessor(ABC):
         pass
 
     def output(self) -> tuple[int, str]:
-        return (42, self.data_list.pop(0))
+        return (0, self.data_list.pop(0) if len(self.data_list) else "")
 
 
 class NumericProcessor(DataProcessor):
@@ -52,7 +52,7 @@ class NumericProcessor(DataProcessor):
                     validate_ok = validate_ok and isinstance(d, (int, float))
         return (validate_ok)
 
-    def ingest(self, data: Any) -> None:
+    def ingest(self, data: int | float | list[int | float]) -> None:
         if not self.validate(data):
             raise ImproperNumericDataError
         if isinstance(data, (list)):
@@ -74,7 +74,7 @@ class TextProcessor(DataProcessor):
                     validate_ok = validate_ok and isinstance(d, (str))
         return (validate_ok)
 
-    def ingest(self, data: Any) -> None:
+    def ingest(self, data: str | list[str]) -> None:
         if not self.validate(data):
             raise ImproperTextDataError
         if isinstance(data, (list)):
@@ -87,7 +87,11 @@ class TextProcessor(DataProcessor):
 class LogProcessor(DataProcessor):
 
     def validate_log(self, log_element: dict[str, str]) -> bool:
-        return ("log_level" in log_element and "log_message" in log_element)
+        return (
+            isinstance(log_element, dict)
+            and "log_level" in log_element
+            and "log_message" in log_element
+        )
 
     def validate(self, data: Any) -> bool:
         validate_ok: bool = True
@@ -101,7 +105,7 @@ class LogProcessor(DataProcessor):
             self.validate_log(data)
         return (validate_ok)
 
-    def ingest(self, data: Any) -> Any:
+    def ingest(self, data: dict[str, str] | list[dict[str, str]]) -> None:
         if not self.validate(data):
             raise ImproperLogDataError
         if isinstance(data, (list)):
@@ -126,7 +130,7 @@ def data_processor() -> None:
     print(f"Try to validate input '{n2}: '{np.validate(n2)}")
     print(f"Test invalid ingestion of string ’{n3}’ without prior validation:")
     try:
-        np.ingest(n3)
+        np.ingest(n3)  # type: ignore
     except ImproperNumericDataError as e:
         print(f"Got exception: {e}")
     print(f"Processing data: {n4}")
@@ -144,7 +148,8 @@ def data_processor() -> None:
     print(f"Try to validate input '{t1}: '{tp.validate(t1)}")
     print(f"Test invalid ingestion of float ’{t3}’ without prior validation:")
     try:
-        tp.ingest(t3)
+        tp.ingest(t1)  # type: ignore
+        tp.ingest(t3)  # type: ignore
     except ImproperTextDataError as e:
         print(f"Got exception: {e}")
     print(f"Processing data: {t2}")
@@ -164,7 +169,7 @@ def data_processor() -> None:
     print(f"Try to validate input '{l1}: '{lp.validate(l1)}")
     print(f"Test invalid ingestion of float ’{l3}’ without prior validation:")
     try:
-        lp.ingest(l3)
+        lp.ingest(l3)  # type: ignore
     except ImproperLogDataError as e:
         print(f"Got exception: {e}")
     print(f"Processing data: {l2}")
