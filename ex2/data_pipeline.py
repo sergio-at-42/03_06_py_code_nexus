@@ -132,13 +132,13 @@ class LogProcessor(DataProcessor):
 
 
 class ExportPlugin(Protocol):
-    
+
     def process_output(self, data: list[tuple[int, str]]) -> None:
         ...
 
 
 class ExportCsv():
-    
+
     def process_output(self, data: list[tuple[int, str]]) -> None:
         csv_output: str = ",".join(list(d[1] for d in data))
         print("CSV Output:")
@@ -146,7 +146,7 @@ class ExportCsv():
 
 
 class ExportJson():
-    
+
     def process_output(self, data: list[tuple[int, str]]) -> None:
         json_output: dict[str, str] = {}
         for d in data:
@@ -190,7 +190,7 @@ class DataStream():
     def output_pipeline(self, nb: int, plugin: ExportPlugin) -> None:
         list_for_plugin: list[tuple[int, str]] = []
         for proc in self.processors:
-            nb_output:int = 0
+            nb_output: int = 0
             list_for_plugin.clear()
             while nb_output < nb and proc.data_list:
                 list_for_plugin.append(proc.output())
