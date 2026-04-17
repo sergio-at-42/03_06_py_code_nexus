@@ -26,19 +26,26 @@ class ImproperLogDataError(Exception):
 class DataProcessor(ABC):
 
     def __init__(self) -> None:
-        self.data_list: list[str] = []
+        self.data_list: dict[int, str] = {}
+        self.older: int = 0
         self.count_ingest: int = 0
 
     @abstractmethod
     def validate(self, data: Any) -> bool:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def ingest(self, data: Any) -> None:
-        pass
+        raise NotImplementedError
 
     def output(self) -> tuple[int, str]:
-        return (0, self.data_list.pop(0) if len(self.data_list) else "")
+        data_output: tuple[int, str]
+        if len(self.data_list):
+            data_output = (self.older, self.data_list.pop(self.older))
+            self.older += 1
+        else:
+            data_output = (0, "")
+        return (data_output)
 
 
 class NumericProcessor(DataProcessor):
@@ -58,10 +65,10 @@ class NumericProcessor(DataProcessor):
             raise ImproperNumericDataError
         if isinstance(data, (list)):
             for d in data:
-                self.data_list.append(str(d))
+                self.data_list[self.count_ingest] = str(d)
                 self.count_ingest += 1
         else:
-            self.data_list.append(str(data))
+            self.data_list[self.count_ingest] = str(data)
             self.count_ingest += 1
 
 
@@ -82,10 +89,10 @@ class TextProcessor(DataProcessor):
             raise ImproperTextDataError
         if isinstance(data, (list)):
             for d in data:
-                self.data_list.append(d)
+                self.data_list[self.count_ingest] = d
                 self.count_ingest += 1
         else:
-            self.data_list.append(data)
+            self.data_list[self.count_ingest] = data
             self.count_ingest += 1
 
 
@@ -115,10 +122,11 @@ class LogProcessor(DataProcessor):
             raise ImproperLogDataError
         if isinstance(data, (list)):
             for d in data:
-                self.data_list.append(f"{d["log_level"]}: {d["log_message"]}")
+                self.data_list[self.count_ingest] = (
+                    f"{d["log_level"]}: {d["log_message"]}")
                 self.count_ingest += 1
         else:
-            self.data_list.append(
+            self.data_list[self.count_ingest] = (
                 f"{data["log_level"]}: {data["log_message"]}")
             self.count_ingest += 1
 
