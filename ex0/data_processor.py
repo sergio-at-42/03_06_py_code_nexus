@@ -160,10 +160,12 @@ def data_processor() -> None:
     t2: list[str] = ["Hello", "Nexus", "World"]
     t3: float = 3.14
     tp = TextProcessor()
-    print(f"Try to validate input '{t1}: '{tp.validate(t1)}")
-    print(f"Test invalid ingestion of float ’{t3}’ without prior validation:")
+    # print(f"Try to validate input '{t1}: '{tp.validate(t1)}")
+    # print(f"Test invalid ingestion of float ’{t3}’ without prior validation:")
     try:
+        print(f"Try to validate input '{t1}: '{tp.validate(t1)}")
         tp.ingest(t1)  # type: ignore
+        print(f"Test invalid ingestion of float ’{t3}’ without prior validation:")
         tp.ingest(t3)  # type: ignore
     except ImproperTextDataError as e:
         print(f"Got exception: {e}")
